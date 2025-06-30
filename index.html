@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Advanced Login</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap');
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      height: 100vh;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      font-family: 'Montserrat', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #f0f0f0;
+      overflow: hidden;
+    }
+    .login-container {
+      background: rgba(255 255 255 / 0.07);
+      backdrop-filter: blur(15px);
+      border-radius: 16px;
+      padding: 40px 50px 50px;
+      width: 360px;
+      box-shadow:
+        0 4px 30px rgba(0, 0, 0, 0.4),
+        inset 0 0 60px rgba(255 255 255 / 0.15);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      animation: fadeInUp 0.8s ease forwards;
+    }
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(40px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    .logo {
+      width: 100px;
+      height: 100px;
+      margin-bottom: 30px;
+      border-radius: 50%;
+      overflow: hidden;
+      box-shadow: 0 0 20px #2ecc71aa;
+      transition: box-shadow 0.3s ease;
+    }
+    .logo img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      filter: drop-shadow(0 0 4px #2ecc71);
+    }
+    .logo:hover {
+      box-shadow: 0 0 40px #2ecc71ff;
+    }
+    h2 {
+      margin: 0 0 25px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      color: #2ecc71;
+      text-shadow: 0 0 10px #2ecc71aa;
+      user-select: none;
+    }
+    form {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+    .input-group {
+      position: relative;
+      margin-bottom: 25px;
+    }
+    input[type="password"] {
+      width: 100%;
+      padding: 14px 50px 14px 18px;
+      border: none;
+      border-radius: 30px;
+      font-size: 16px;
+      background: rgba(255 255 255 / 0.15);
+      color: #e0e0e0;
+      outline: none;
+      transition: background-color 0.3s ease;
+      box-shadow: inset 0 0 5px rgba(255 255 255 / 0.1);
+    }
+    input[type="password"]::placeholder {
+      color: #b0b0b0;
+      font-style: italic;
+    }
+    input[type="password"]:focus {
+      background: rgba(255 255 255 / 0.25);
+      box-shadow:
+        0 0 8px #2ecc71,
+        inset 0 0 8px rgba(46, 204, 113, 0.8);
+    }
+    .toggle-password {
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 28px;
+      height: 28px;
+      cursor: pointer;
+      fill: #2ecc71cc;
+      transition: fill 0.3s ease;
+    }
+    .toggle-password:hover {
+      fill: #2ecc71ff;
+    }
+    button {
+      background: linear-gradient(135deg, #2ecc71, #27ae60);
+      border: none;
+      border-radius: 30px;
+      padding: 14px 0;
+      color: #fff;
+      font-weight: 600;
+      font-size: 18px;
+      letter-spacing: 1.2px;
+      cursor: pointer;
+      box-shadow: 0 6px 15px #27ae60aa;
+      transition: box-shadow 0.3s ease, background 0.3s ease;
+      user-select: none;
+    }
+    button:hover {
+      background: linear-gradient(135deg, #27ae60, #2ecc71);
+      box-shadow: 0 8px 20px #2ecc71dd;
+    }
+    .error-message {
+      color: #ff4d4f;
+      font-weight: 600;
+      text-align: center;
+      margin-top: -10px;
+      margin-bottom: 20px;
+      min-height: 20px;
+      user-select: none;
+    }
+    @media (max-width: 400px) {
+      .login-container {
+        width: 90vw;
+        padding: 30px 20px 40px;
+      }
+      input[type="password"] {
+        font-size: 14px;
+        padding-left: 14px;
+      }
+      button {
+        font-size: 16px;
+        padding: 12px 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-container" role="main" aria-label="CipherLock login form">
+    <div class="logo" aria-hidden="true">
+      <img src="https://uploads.onecompiler.io/43btugq7w/43nr9t7vy/Screenshot%202025-06-24%20173628-Photoroom.png" alt="CipherLock Logo" />
+    </div>
+    <h2>Welcome Back</h2>
+    <form id="loginForm" onsubmit="return checkPassword(event)" novalidate>
+      <div class="input-group">
+        <input
+          id="password"
+          type="password"
+          placeholder="Enter Your Password"
+          aria-label="Password"
+          autocomplete="off"
+          required
+        />
+        <svg
+          class="toggle-password"
+          id="togglePassword"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+          role="button"
+          tabindex="0"
+          aria-label="Toggle password visibility"
+          title="Show password"
+        >
+          <path d="M12 5C7 5 2.73 8.11 1 12c1.73 3.89 6 7 11 7s9.27-3.11 11-7c-1.73-3.89-6-7-11-7zm0 12a5 5 0 110-10 5 5 0 010 10z" />
+          <circle cx="12" cy="12" r="2.5" />
+        </svg>
+      </div>
+      <div class="error-message" id="error"></div>
+      <button type="submit" aria-live="polite">Login</button>
+    </form>
+  </div>
+
+<script>
+  // Password hashes (SHA-256 hex)
+  const validHashes = [
+    "18c6391f72753a435ba027ea2433757e181b24b495a311f6f99d767a3634de44",
+    "8ee016886ec57b9ff5a562545e365282e72af339a34cbae728aa8a755789e17d",
+    "50de4b3f3639ae7aa152465bbd1d61441fc0baa5b72388a34a0213bcb930e3a5",
+    "e038ba35682a494f3ab8296725071ad714728c0f745fd7b929582a7cde7f2497"
+  ];
+
+  function getQueryParam(name) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(name);
+  }
+
+  function base64Decode(str) {
+    try {
+      str = str.replace(/-/g, '+').replace(/_/g, '/');
+      while (str.length % 4) {
+        str += '=';
+      }
+      return decodeURIComponent(escape(window.atob(str)));
+    } catch {
+      return null;
+    }
+  }
+
+  async function sha256Hex(str) {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(str);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  }
+
+  async function checkPassword(event) {
+    event.preventDefault();
+    const errorDiv = document.getElementById('error');
+    errorDiv.textContent = '';
+    errorDiv.style.display = 'none';
+
+    const input = document.getElementById('password').value.trim();
+    if (!input) {
+      errorDiv.textContent = "Please enter your password.";
+      errorDiv.style.display = 'block';
+      return false;
+    }
+
+    const inputHash = await sha256Hex(input);
+    if (validHashes.includes(inputHash)) {
+      const encoded = getQueryParam('id');
+      const redirectUrl = base64Decode(encoded) || 'home.html';
+
+      if (/^(https?:\/\/|\/)/i.test(redirectUrl)) {
+        window.location.href = redirectUrl;
+      } else {
+        errorDiv.textContent = "Invalid redirect URL.";
+        errorDiv.style.display = 'block';
+      }
+    } else {
+      errorDiv.textContent = "Incorrect password.";
+      errorDiv.style.display = 'block';
+    }
+    return false;
+  }
+
+  // Toggle password visibility
+  const togglePassword = document.getElementById('togglePassword');
+  const passwordInput = document.getElementById('password');
+
+  togglePassword.addEventListener('click', () => {
+    const type = passwordInput.type === 'password' ? 'text' : 'password';
+    passwordInput.type = type;
+    togglePassword.title = type === 'password' ? 'Show password' : 'Hide password';
+    togglePassword.style.fill = type === 'password' ? '#2ecc71cc' : '#2ecc71ff';
+  });
+
+  // Accessibility: allow toggle with keyboard
+  togglePassword.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      togglePassword.click();
+    }
+  });
+</script>
+
+</body>
+</html>
