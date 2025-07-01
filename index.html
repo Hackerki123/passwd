@@ -26,23 +26,15 @@
       border-radius: 16px;
       padding: 40px 50px 50px;
       width: 360px;
-      box-shadow:
-        0 4px 30px rgba(0, 0, 0, 0.4),
-        inset 0 0 60px rgba(255, 255, 255, 0.15);
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4), inset 0 0 60px rgba(255, 255, 255, 0.15);
       display: flex;
       flex-direction: column;
       align-items: center;
       animation: fadeInUp 0.8s ease forwards;
     }
     @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(40px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      from { opacity: 0; transform: translateY(40px); }
+      to { opacity: 1; transform: translateY(0); }
     }
     .logo {
       width: 100px;
@@ -97,23 +89,7 @@
     }
     input[type="password"]:focus {
       background: rgba(255, 255, 255, 0.25);
-      box-shadow:
-        0 0 8px #2ecc71,
-        inset 0 0 8px rgba(46, 204, 113, 0.8);
-    }
-    .toggle-password {
-      position: absolute;
-      right: 15px;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 28px;
-      height: 28px;
-      cursor: pointer;
-      fill: #2ecc71cc;
-      transition: fill 0.3s ease;
-    }
-    .toggle-password:hover {
-      fill: #2ecc71ff;
+      box-shadow: 0 0 8px #2ecc71, inset 0 0 8px rgba(46, 204, 113, 0.8);
     }
     button {
       background: linear-gradient(135deg, #2ecc71, #27ae60);
@@ -142,6 +118,17 @@
       min-height: 20px;
       user-select: none;
     }
+    iframe#iframeBox {
+      display: none;
+      width: 100vw;
+      height: 100vh;
+      border: none;
+      animation: fadeIn 0.6s ease forwards;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
     @media (max-width: 400px) {
       .login-container {
         width: 90vw;
@@ -160,9 +147,9 @@
 </head>
 <body>
 
-  <div class="login-container" role="main" aria-label="CipherLock login form">
+  <div class="login-container" role="main" aria-label="Login form">
     <div class="logo" aria-hidden="true">
-      <img src="https://uploads.onecompiler.io/43btugq7w/43pbq8mex/lock.png" alt="CipherLock Logo" />
+      <img src="https://uploads.onecompiler.io/43btugq7w/43pbq8mex/lock.png" alt="Lock Logo" />
     </div>
     <h2>Welcome Back</h2>
     <form onsubmit="checkPassword(event)">
@@ -181,8 +168,9 @@
     </form>
   </div>
 
+  <iframe id="iframeBox" allowfullscreen></iframe>
+
   <script>
-    // Password hashes (SHA-256 hex)
     const validHashes = [
       "18c6391f72753a435ba027ea2433757e181b24b495a311f6f99d767a3634de44",
       "8ee016886ec57b9ff5a562545e365282e72af339a34cbae728aa8a755789e17d",
@@ -229,10 +217,13 @@
       const inputHash = await sha256Hex(input);
       if (validHashes.includes(inputHash)) {
         const encoded = getQueryParam('id');
-        const redirectUrl = base64Decode(encoded) || 'home.html';
+        const redirectUrl = base64Decode(encoded);
 
         if (/^(https?:\/\/|\/)/i.test(redirectUrl)) {
-          window.location.href = redirectUrl;
+          document.querySelector('.login-container').style.display = 'none';
+          const iframe = document.getElementById('iframeBox');
+          iframe.src = redirectUrl;
+          iframe.style.display = 'block';
         } else {
           errorDiv.textContent = "Invalid redirect URL.";
           errorDiv.style.display = 'block';
@@ -243,24 +234,6 @@
       }
       return false;
     }
-
-    // Toggle password visibility
-    const togglePassword = document.getElementById('togglePassword');
-    const passwordInput = document.getElementById('password');
-
-    togglePassword.addEventListener('click', () => {
-      const type = passwordInput.type === 'password' ? 'text' : 'password';
-      passwordInput.type = type;
-      togglePassword.title = type === 'password' ? 'Show password' : 'Hide password';
-      togglePassword.style.fill = type === 'password' ? '#2ecc71cc' : '#2ecc71ff';
-    });
-
-    togglePassword.addEventListener('keydown', e => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        togglePassword.click();
-      }
-    });
   </script>
 </body>
 </html>
