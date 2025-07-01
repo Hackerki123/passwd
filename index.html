@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" >
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -21,14 +21,14 @@
       overflow: hidden;
     }
     .login-container {
-      background: rgba(255 255 255 / 0.07);
+      background: rgba(255, 255, 255, 0.07);
       backdrop-filter: blur(15px);
       border-radius: 16px;
       padding: 40px 50px 50px;
       width: 360px;
       box-shadow:
         0 4px 30px rgba(0, 0, 0, 0.4),
-        inset 0 0 60px rgba(255 255 255 / 0.15);
+        inset 0 0 60px rgba(255, 255, 255, 0.15);
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -85,18 +85,18 @@
       border: none;
       border-radius: 30px;
       font-size: 16px;
-      background: rgba(255 255 255 / 0.15);
+      background: rgba(255, 255, 255, 0.15);
       color: #e0e0e0;
       outline: none;
       transition: background-color 0.3s ease;
-      box-shadow: inset 0 0 5px rgba(255 255 255 / 0.1);
+      box-shadow: inset 0 0 5px rgba(255, 255, 255, 0.1);
     }
     input[type="password"]::placeholder {
       color: #b0b0b0;
       font-style: italic;
     }
     input[type="password"]:focus {
-      background: rgba(255 255 255 / 0.25);
+      background: rgba(255, 255, 255, 0.25);
       box-shadow:
         0 0 8px #2ecc71,
         inset 0 0 8px rgba(46, 204, 113, 0.8);
@@ -165,6 +165,7 @@
       <img src="https://uploads.onecompiler.io/43btugq7w/43pbq8mex/lock.png" alt="CipherLock Logo" />
     </div>
     <h2>Welcome Back</h2>
+    <form onsubmit="checkPassword(event)">
       <div class="input-group">
         <input
           id="password"
@@ -193,90 +194,86 @@
     </form>
   </div>
 
-<script>
-  // Password hashes (SHA-256 hex)
-  const validHashes = [
-    "18c6391f72753a435ba027ea2433757e181b24b495a311f6f99d767a3634de44",
-    "8ee016886ec57b9ff5a562545e365282e72af339a34cbae728aa8a755789e17d",
-    "50de4b3f3639ae7aa152465bbd1d61441fc0baa5b72388a34a0213bcb930e3a5",
-    "e038ba35682a494f3ab8296725071ad714728c0f745fd7b929582a7cde7f2497"
-  ];
+  <script>
+    // Password hashes (SHA-256 hex)
+    const validHashes = [
+      "18c6391f72753a435ba027ea2433757e181b24b495a311f6f99d767a3634de44",
+      "8ee016886ec57b9ff5a562545e365282e72af339a34cbae728aa8a755789e17d",
+      "50de4b3f3639ae7aa152465bbd1d61441fc0baa5b72388a34a0213bcb930e3a5",
+      "e038ba35682a494f3ab8296725071ad714728c0f745fd7b929582a7cde7f2497"
+    ];
 
-  function getQueryParam(name) {
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get(name);
-  }
-
-  function base64Decode(str) {
-    try {
-      str = str.replace(/-/g, '+').replace(/_/g, '/');
-      while (str.length % 4) {
-        str += '=';
-      }
-      return decodeURIComponent(escape(window.atob(str)));
-    } catch {
-      return null;
+    function getQueryParam(name) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(name);
     }
-  }
 
-  async function sha256Hex(str) {
-    const encoder = new TextEncoder();
-    const data = encoder.encode(str);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-  }
+    function base64Decode(str) {
+      try {
+        str = str.replace(/-/g, '+').replace(/_/g, '/');
+        while (str.length % 4) str += '=';
+        return decodeURIComponent(escape(window.atob(str)));
+      } catch {
+        return null;
+      }
+    }
 
-  async function checkPassword(event) {
-    event.preventDefault();
-    const errorDiv = document.getElementById('error');
-    errorDiv.textContent = '';
-    errorDiv.style.display = 'none';
+    async function sha256Hex(str) {
+      const encoder = new TextEncoder();
+      const data = encoder.encode(str);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
 
-    const input = document.getElementById('password').value.trim();
-    if (!input) {
-      errorDiv.textContent = "Please enter your password.";
-      errorDiv.style.display = 'block';
+    async function checkPassword(event) {
+      event.preventDefault();
+      const errorDiv = document.getElementById('error');
+      errorDiv.textContent = '';
+      errorDiv.style.display = 'none';
+
+      const input = document.getElementById('password').value.trim();
+      if (!input) {
+        errorDiv.textContent = "Please enter your password.";
+        errorDiv.style.display = 'block';
+        return false;
+      }
+
+      const inputHash = await sha256Hex(input);
+      if (validHashes.includes(inputHash)) {
+        const encoded = getQueryParam('id');
+        const redirectUrl = base64Decode(encoded) || 'home.html';
+
+        if (/^(https?:\/\/|\/)/i.test(redirectUrl)) {
+          window.location.href = redirectUrl;
+        } else {
+          errorDiv.textContent = "Invalid redirect URL.";
+          errorDiv.style.display = 'block';
+        }
+      } else {
+        errorDiv.textContent = "Incorrect password.";
+        errorDiv.style.display = 'block';
+      }
       return false;
     }
 
-    const inputHash = await sha256Hex(input);
-    if (validHashes.includes(inputHash)) {
-      const encoded = getQueryParam('id');
-      const redirectUrl = base64Decode(encoded) || 'home.html';
+    // Toggle password visibility
+    const togglePassword = document.getElementById('togglePassword');
+    const passwordInput = document.getElementById('password');
 
-      if (/^(https?:\/\/|\/)/i.test(redirectUrl)) {
-        window.location.href = redirectUrl;
-      } else {
-        errorDiv.textContent = "Invalid redirect URL.";
-        errorDiv.style.display = 'block';
+    togglePassword.addEventListener('click', () => {
+      const type = passwordInput.type === 'password' ? 'text' : 'password';
+      passwordInput.type = type;
+      togglePassword.title = type === 'password' ? 'Show password' : 'Hide password';
+      togglePassword.style.fill = type === 'password' ? '#2ecc71cc' : '#2ecc71ff';
+    });
+
+    togglePassword.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        togglePassword.click();
       }
-    } else {
-      errorDiv.textContent = "Incorrect password.";
-      errorDiv.style.display = 'block';
-    }
-    return false;
-  }
-
-  // Toggle password visibility
-  const togglePassword = document.getElementById('togglePassword');
-  const passwordInput = document.getElementById('password');
-
-  togglePassword.addEventListener('click', () => {
-    const type = passwordInput.type === 'password' ? 'text' : 'password';
-    passwordInput.type = type;
-    togglePassword.title = type === 'password' ? 'Show password' : 'Hide password';
-    togglePassword.style.fill = type === 'password' ? '#2ecc71cc' : '#2ecc71ff';
-  });
-
-  // Accessibility: allow toggle with keyboard
-  togglePassword.addEventListener('keydown', e => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      togglePassword.click();
-    }
-  });
-</script>
-
+    });
+  </script>
 </body>
 </html>
