@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Auto Login Redirect</title>
+  <style>
+    body {
+      margin: 0;
+      background: #000;
+      color: #fff;
+      font-family: sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    iframe {
+      width: 100vw;
+      height: 100vh;
+      border: none;
+      display: none;
+    }
+    .error {
+      color: red;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="message">Checking access...</div>
+  <iframe id="frame"></iframe>
+
+  <script>
+    const validHashes = [
+      "18c6391f72753a435ba027ea2433757e181b24b495a311f6f99d767a3634de44",
+      "8ee016886ec57b9ff5a562545e365282e72af339a34cbae728aa8a755789e17d",
+      "50de4b3f3639ae7aa152465bbd1d61441fc0baa5b72388a34a0213bcb930e3a5"
+    ];
+
+    function getParam(name) {
+      return new URLSearchParams(window.location.search).get(name);
+    }
+
+    function base64Decode(str) {
+      try {
+        str = str.replace(/-/g, '+').replace(/_/g, '/');
+        while (str.length % 4) str += '=';
+        return decodeURIComponent(escape(window.atob(str)));
+      } catch {
+        return null;
+      }
+    }
+
+    async function sha256Hex(str) {
+      const data = new TextEncoder().encode(str);
+      const hash = await crypto.subtle.digest('SHA-256', data);
+      return [...new Uint8Array(hash)].map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    async function run() {
+      const password = getParam('pass');
+      const base64url = getParam('id');
+      const message = document.getElementById('message');
+      const iframe = document.getElementById('frame');
+
+      if (!password || !base64url) {
+        message.textContent = 'Missing password or id.';
+        message.classList.add('error');
+        return;
+      }
+
+      const hash = await sha256Hex(password);
+      if (!validHashes.includes(hash)) {
+        message.textContent = 'Invalid password.';
+        message.classList.add('error');
+        return;
+      }
+
+      const decoded = base64Decode(base64url);
+      if (!decoded || !/^(https?:\/\/|\/)/i.test(decoded)) {
+        message.textContent = 'Invalid or unsafe URL.';
+        message.classList.add('error');
+        return;
+      }
+
+      // All good, show iframe
+      message.style.display = 'none';
+      iframe.src = decoded;
+      iframe.style.display = 'block';
+    }
+
+    run();
+  </script>
+</body>
+</html>
